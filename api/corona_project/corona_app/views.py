@@ -90,12 +90,12 @@ class CoronaAppResult(APIView):
 
 
 		#res_intersect = overlay(positivePointsBuffered,negativePointsBuffered,how='intersection')
-		#res_intersect=res_intersect.drop(['Status_1','UUID_1','Lat_1','Lng_1','geometry'])
+		res_intersect=res_intersect.drop(['geometry'],axis=1)
 		res_intersect.rename(columns={'Status':'Status',
                           'UUID':'UUID',
                           'Lat':'Lat',
                           'Lng':'Lng'},inplace=True)
 		#res_intersect['UUID_2'],res_intersect['Status_2']
 		#res_intersect.drop_duplicates(subset ="UUID",keep = "first", inplace = True)
-		res_intersect['Timeslot']=timestamp_string
+		#res_intersect['Timeslot']=timestamp_string
 		return res_intersect
