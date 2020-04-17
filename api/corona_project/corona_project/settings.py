@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_multiple_model',
-    'corona_app',
-    #'corona_app.apps.CoronaAppConfig',
+    # 'corona_app',
+    'corona_app.apps.CoronaAppConfig',
 ]
 
 MIDDLEWARE = [
@@ -71,12 +71,16 @@ TEMPLATES = [
     },
 ]
 
+REST_FRAMEWORK = {
+
+    'DATETIME_FORMAT': "%H.%M.%d.%m.%Y", 
+}
+
 WSGI_APPLICATION = 'corona_project.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

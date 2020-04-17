@@ -13,20 +13,14 @@ STYLE_CHOICES = sorted([(item, item) for item in get_all_styles()])
 
 
 class CoronaApp(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
+	uuid = models.CharField(max_length=1000, default='a')
+	timeslot = models.CharField(max_length=100, default='00.00.01.01.2020')
+	
+	status = models.IntegerField(default=0)
+	
+	latitude= models.FloatField(default=0)
+	longitude= models.FloatField(default=0)
 
-    name = models.CharField(max_length=100, blank=True, default='a')
-    status = models.IntegerField(default=0)
-    
-    latitude= models.FloatField(default=0)
-    longitude= models.FloatField(default=0)
-
-    diabetes = models.BooleanField(default=False)
-
-
-
-    class Meta:
-        ordering = ['created']
 
 
 class MedicalMap(models.Model):

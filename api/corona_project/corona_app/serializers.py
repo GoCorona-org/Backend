@@ -4,13 +4,13 @@ from corona_app.models import CoronaApp, MedicalMap, LANGUAGE_CHOICES, STYLE_CHO
 
 class CoronaAppSerializer(serializers.Serializer):
 
-    name = serializers.CharField(max_length=100, default='a')
+    timeslot = serializers.CharField(max_length=100, default='00.00.01.01.2020')
+    uuid = serializers.CharField(max_length=100, default='a')
     status = serializers.IntegerField(default=0)
     
     latitude= serializers.FloatField(default=0)
     longitude= serializers.FloatField(default=0)
-    diabetes = serializers.BooleanField(default=False)
-
+    
     #required=True, 
 
     def create(self, validated_data):
@@ -23,11 +23,11 @@ class CoronaAppSerializer(serializers.Serializer):
         """
         Update and return an existing `Snippet` instance, given the validated data.
         """
-        instance.name = validated_data.get('name', instance.name)
+        instance.timeslot = validated_data.get('name', instance.timeslot)
+        instance.uuid = validated_data.get('name', instance.uuid)
         instance.status = validated_data.get('status', instance.status)
         instance.latitude = validated_data.get('latitude', instance.latitude)
         instance.longitude = validated_data.get('longitude', instance.longitude)
-        instance.diabetes = validated_data.get('diabetes', instance.diabetes)
         
         instance.save()
         return instance
