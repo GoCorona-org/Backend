@@ -1,25 +1,60 @@
-from django.shortcuts import render
-
 # Create your views here.
 from corona_app.models import CoronaApp, MedicalMap
 from corona_app.serializers import CoronaAppSerializer
 from corona_app.forms import MedicalMapForm
 from corona_app.calculations import intersection_calculator, MedicalScoreCalculator
+
 from rest_framework import mixins
 from rest_framework import generics
 from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from rest_framework.parsers import JSONParser
+from rest_framework import status
+
+from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django_pandas.io import read_frame
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 import geopandas as gpd
 from geopandas import GeoDataFrame, GeoSeries, overlay
 from shapely.geometry import Point, Polygon
+
 import numpy as np
 import pandas as pd
 import glob, os
 import csv
+
+
+# @csrf_exempt
+@api_view(['GET', 'POST'])
+def corona_history_list(request):
+    """
+    List all code snippets, or create a new snippet.
+    """
+    if request.method == 'GET':
+        covids = CoronaApp.objects.all()
+        serializer = CoronaAppSerializer(covids, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        # data = JSONParser().parse(request)
+        data = request.data
+
+        # data = eval(data)
+        for times in data["location_history"]:
+        	app_data = {'uuid': data['id'], 'timeslot': times['timeslot'], 'status': times['status'], 'latitude': times['lat'], 'longitude': times['long']}
+        	print(app_data)
+        	serializer = CoronaAppSerializer(data = app_data)
+        	if serializer.is_valid():
+        		serializer.save()
+        		print("saved")
+        		
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class CoronaAppList(mixins.ListModelMixin,
@@ -31,21 +66,21 @@ class CoronaAppList(mixins.ListModelMixin,
     serializer_class = CoronaAppSerializer
 
     def get(self, request, *args, **kwargs):
-    	CoronaApp.objects.all().delete()
+    	# CoronaApp.objects.all().delete()
 
-    	for subdir, dirs, files in os.walk("user_location_data"):
-    		for file in files:
-    			file_path = "user_location_data" + os.sep + file
-    			data_file = open(file_path , 'r')       
-    			data = data_file.read()
-    			data = eval(data)
-    			for times in data["location_history"]:
-    				app_data = {'uuid': data['id'], 'timeslot': times['timeslot'], 'status': times['status'], 'latitude': times['lat'], 'longitude': times['long']}
-    				print(app_data)
-    				serializer = CoronaAppSerializer(data = app_data)
-    				if serializer.is_valid():
-    					serializer.save()
-    					print("saved")
+    	# for subdir, dirs, files in os.walk("user_location_data"):
+    	# 	for file in files:
+    	# 		file_path = "user_location_data" + os.sep + file
+    	# 		data_file = open(file_path , 'r')       
+    	# 		data = data_file.read()
+    	# 		data = eval(data)
+    	# 		for times in data["location_history"]:
+    	# 			app_data = {'uuid': data['id'], 'timeslot': times['timeslot'], 'status': times['status'], 'latitude': times['lat'], 'longitude': times['long']}
+    	# 			print(app_data)
+    	# 			serializer = CoronaAppSerializer(data = app_data)
+    	# 			if serializer.is_valid():
+    	# 				serializer.save()
+    	# 				print("saved")
 
     	return self.list(request, *args, **kwargs)
 

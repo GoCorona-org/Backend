@@ -5,7 +5,7 @@ from corona_app import views
 app_name = 'corona_app'
 
 urlpatterns = [
-    path('corona_app/', views.CoronaAppList.as_view()),
+    path('corona_app/', views.corona_history_list),
     # path('corona_app/users', views.CoronaAppID.as_view()),
     path('corona_app/<int:pk>/', views.CoronaAppDetail.as_view()),
     path('corona_app/result/', views.CoronaAppTimeslots.as_view()),
