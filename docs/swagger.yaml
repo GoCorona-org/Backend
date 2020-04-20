@@ -74,7 +74,6 @@ paths:
         type: "string"
         description: "Patient status to be queried"
         enum:
-          - "unknown"
           - "exposed"
           - "positive"
       responses:
@@ -298,6 +297,7 @@ definitions:
       timeslot:
         type: "string"
         format: date-time
+        description: "The timeslot should be sent by the application, rounded to the nearest 10 min time. ie 07:50 is acceptable, 08:00 is acceptable, but 07:57 is not"
       lat:
         type: "number"
         format: float
