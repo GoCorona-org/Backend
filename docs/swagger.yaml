@@ -74,6 +74,7 @@ paths:
         type: "string"
         description: "Patient status to be queried"
         enum:
+          - "unknown"
           - "exposed"
           - "positive"
       responses:
@@ -112,10 +113,61 @@ paths:
         400:
           description: "Invalid ID supplied"
         404:
-          description: "Pet not found"
+          description: "Page not found"
       security:
       - api_key: []
       - spotcorona_auth:
+        - "read:spotcorona_api"
+        
+  /Medical/Form:
+    post:
+      tags:
+      - "Medical"
+      summary: "Add a set of answers from the medical questionnaire to the database"
+      description: ""
+      operationId: "reportQuestionnaireAnswers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Questionnaire answers object that needs to be added to the database"
+        required: true
+        schema:
+          $ref: "#/definitions/Medical"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - spotcorona_auth:
+        - "write:spotcorona_api"
+        - "read:spotcorona_api"
+  /Medical/Travel:
+    post:
+      tags:
+      - "Travel History"
+      summary: "Add a set of answers from the travel questionnaire to the database"
+      description: ""
+      operationId: "reportTravelAnswers"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Travel History answers object that needs to be added to the database"
+        required: true
+        schema:
+          $ref: "#/definitions/Travel"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - spotcorona_auth:
+        - "write:spotcorona_api"
         - "read:spotcorona_api"
   /user:
     post:
@@ -271,7 +323,7 @@ securityDefinitions:
     type: "apiKey"
     name: "api_key"
     in: "header"
-  
+
 definitions:
   Status:
     type: "string"
@@ -297,7 +349,6 @@ definitions:
       timeslot:
         type: "string"
         format: date-time
-        description: "The timeslot should be sent by the application, rounded to the nearest 10 min time. ie 07:50 is acceptable, 08:00 is acceptable, but 07:57 is not"
       lat:
         type: "number"
         format: float
@@ -325,6 +376,138 @@ definitions:
           $ref: "#/definitions/Point"
     xml:
       name: "points"
+ 
+  OneHotEncoding:
+    type: "array"
+    items:
+      type: "integer"
+
+    description: "An OneHotEncoded array with the  value 1 for the option selected or zero ([0,0,0,0,0,0] by default or when clicked No)"
+
+  Multioptions:
+    type: "array"
+    items:
+      type: "integer"
+
+    description: "An array with each value 1 for each option or zero ([0,0,0,0,0,0,0] by default or when clicked non of the above)"
+    
+  Questions_Medical:
+    type: "object"
+    properties:
+      Gender:
+        type: "string"
+        format: string
+      Age:
+        type: "number"
+        format: int
+      Height:
+        type: "number"
+        format: int
+      Weight:
+        type: "number"
+        format: int
+      Smoking:
+        type: "number"
+        format: int
+      Immunity:
+        type: "number"
+        format: int
+      Prev_Conditions:
+        $ref: "#/definitions/Multioptions"
+      Cough:
+        $ref: "#/definitions/OneHotEncoding"
+      Breathless:
+        $ref: "#/definitions/OneHotEncoding"
+      Sore Throat:
+        type: "number"
+        format: int
+      Nasal Congestion:
+        type: "number"
+        format: int
+      Loss of Taste/Smell:
+        type: "number"
+        format: int
+      Body Pain:
+        type: "number"
+        format: int 
+      Fatigue:
+        type: "number"
+        format: int
+      Symptoms:
+        $ref: "#/definitions/Multioptions"
+      Fever_time: 
+        type: "number"
+        format: int
+      Cough_time: 
+        type: "number"
+        format: int
+      Headache_time: 
+        type: "number"
+        format: int
+      Development: 
+        $ref: "#/definitions/OneHotEncoding"
+
+    xml:
+      name: "questions"
+      
+  Medical:
+    type: "object"
+    description: "This is the model used to report a person's medical response to the backend"
+    required:
+    - "user_location_id"
+    - "questionnaire"
+    properties:
+      user_location_id:
+        type: "string"
+        format: uuid
+        description: "This is different from user's personal id or login id, and is a randomly generated id that is created by the user's mobile app"
+      questionnaire:
+        type: "array"
+        items:
+          $ref: "#/definitions/Questions_Medical"
+    xml:
+      name: "questions"
+      
+  Questions_Travel:
+    type: "object"
+    properties:
+      International_travel:
+        type: "integer"
+        format: int
+      Domestic_travel:
+        type: "integer"
+        format: int
+      HomeTown:
+        type: "string"
+        format: string
+      Current Location:
+        type: "string"
+        format: string
+      Transport:
+        $ref: "#/definitions/Multioptions"
+
+
+    xml:
+      name: "questions"
+      
+  Travel:
+    type: "object"
+    description: "This is the model used to report a person's medical response to the backend"
+    required:
+    - "user_location_id"
+    - "questionnaire"
+    properties:
+      user_location_id:
+        type: "string"
+        format: uuid
+        description: "This is different from user's personal id or login id, and is a randomly generated id that is created by the user's mobile app"
+      questionnaire:
+        type: "array"
+        items:
+          $ref: "#/definitions/Questions_Travel"
+    xml:
+      name: "questions"
+
   User:
     type: "object"
     properties:
@@ -358,4 +541,4 @@ definitions:
       type:
         type: "string"
       message:
-        type: "string"
+        type: "string" 
