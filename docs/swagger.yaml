@@ -144,6 +144,37 @@ paths:
       - spotcorona_auth:
         - "write:spotcorona_api"
         - "read:spotcorona_api"
+    
+  /Medical/Form/{user_medical_id}:
+    get:
+      tags:
+      - "Medical"
+      summary: "Return the user medical score with the queried id"
+      description: "Returns the Medical Form score"
+      operationId: "getFormScoreById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_medical_id"
+        in: "path"
+        description: "ID of user to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Result"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Page not found"
+      security:
+      - api_key: []
+      - spotcorona_auth:
+        - "read:spotcorona_api"
+        
   /Medical/Travel:
     post:
       tags:
@@ -168,6 +199,35 @@ paths:
       security:
       - spotcorona_auth:
         - "write:spotcorona_api"
+        - "read:spotcorona_api"
+  /Medical/{user_medical_id}:
+   get:
+      tags:
+      - "Medical"
+      summary: "Return the user total score with the queried id"
+      description: "Returns the Total score"
+      operationId: "getTotalScoreById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "user_medical_id"
+        in: "path"
+        description: "ID of user to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Result"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Page not found"
+      security:
+      - api_key: []
+      - spotcorona_auth:
         - "read:spotcorona_api"
   /user:
     post:
@@ -454,10 +514,10 @@ definitions:
     type: "object"
     description: "This is the model used to report a person's medical response to the backend"
     required:
-    - "user_location_id"
+    - "user_medical_id"
     - "questionnaire"
     properties:
-      user_location_id:
+      user_medical_id:
         type: "string"
         format: uuid
         description: "This is different from user's personal id or login id, and is a randomly generated id that is created by the user's mobile app"
@@ -472,11 +532,13 @@ definitions:
     type: "object"
     properties:
       International_travel:
-        type: "integer"
-        format: int
+        type: "array"
+        items:
+          type: "string"
       Domestic_travel:
-        type: "integer"
-        format: int
+        type: "array"
+        items:
+          type: "string"
       HomeTown:
         type: "string"
         format: string
@@ -494,10 +556,10 @@ definitions:
     type: "object"
     description: "This is the model used to report a person's medical response to the backend"
     required:
-    - "user_location_id"
+    - "user_medical_id"
     - "questionnaire"
     properties:
-      user_location_id:
+      user_medical_id:
         type: "string"
         format: uuid
         description: "This is different from user's personal id or login id, and is a randomly generated id that is created by the user's mobile app"
@@ -505,6 +567,24 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/Questions_Travel"
+    xml:
+      name: "questions"
+      
+  Result:
+    type: "object"
+    description: "This is the model used to report a person's score"
+    required:
+    - "user_medical_id"
+    - "questionnaire"
+    properties:
+      user_medical_id:
+        type: "string"
+        format: uuid
+        description: "This is different from user's personal id or login id, and is a randomly generated id that is created by the user's mobile app"
+      score:
+        type: "number"
+        format: float
+
     xml:
       name: "questions"
 
@@ -541,4 +621,4 @@ definitions:
       type:
         type: "string"
       message:
-        type: "string" 
+        type: "string"
