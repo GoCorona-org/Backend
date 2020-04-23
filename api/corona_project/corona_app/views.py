@@ -34,39 +34,11 @@ import glob, os
 import csv, json
 
 
-# @csrf_exempt
-@api_view(['GET', 'POST'])
-def corona_history_list(request):
-    """
-    List all code snippets, or create a new snippet.
-    """
-    if request.method == 'GET':
-        # covids = CoronaApp.objects.all()
-        # serializer = CoronaAppSerializer(covids, many=True)
-        # return Response(serializer.data)
-        return Response("Post your Location History Data here")
-
-
-    elif request.method == 'POST':
-    	data = request.data
-    	status_dict = {'unknown': -1, 'positive': 0}
-
-    	for times in data["location_history"]:
-    		app_data = {'uuid': data['id'], 'timeslot': times['timeslot'], 'degree': status_dict[times['status']], 'latitude': times['lat'], 'longitude': times['long']}
-    		print(app_data)
-    		serializer = CoronaAppSerializer(data = app_data)
-    		if serializer.is_valid():
-    			serializer.save()
-    			print("saved")
-
-
-    	return Response(data['id'], status=status.HTTP_201_CREATED)
-
-	
 
 class CoronaAppResult(APIView):
 	
 	def get(self, request, format=None):
+		time_value_list = CoronaApp.objects.values_list('timeslot', flat=True).distinct()
 		# data = CoronaApp.objects.get(timeslot = time_value_list[int(timeno)])
 		# data = CoronaApp.objects.filter(timeslot = time_value_list[int(timeno)])
 
@@ -88,6 +60,20 @@ class CoronaAppResult(APIView):
 
 		return Response("Intersection Calculations Done")
 		# return Response(exposed)              # Return the result in JSON via Django REST Framework
+
+	def post(self, request, format=None):
+		data = request.data
+		status_dict = {'unknown': -1, 'positive': 0}
+
+		for times in data["location_history"]:
+			app_data = {'uuid': data['id'], 'timeslot': times['timeslot'], 'degree': status_dict[times['status']], 'latitude': times['lat'], 'longitude': times['long']}
+			print(app_data)
+			serializer = CoronaAppSerializer(data = app_data)
+			if serializer.is_valid():
+				serializer.save()
+				print("saved")
+
+		return Response(data['id'], status=status.HTTP_201_CREATED)
 
 
 class IntersectMapResult(APIView):
@@ -141,13 +127,13 @@ class UserExposure(APIView):
 			return Response({"Exposure": status_dict[-1]})
 
 
-class CoronaAppTimeslots(APIView):
+# class CoronaAppTimeslots(APIView):
 	
-	def get(self, request, format=None):
-		time_value_list = CoronaApp.objects.values_list('timeslot', flat=True).distinct()
-		print(time_value_list)
-		print(type(time_value_list))
-		return Response(time_value_list)
+# 	def get(self, request, format=None):
+# 		time_value_list = CoronaApp.objects.values_list('timeslot', flat=True).distinct()
+# 		print(time_value_list)
+# 		print(type(time_value_list))
+# 		return Response(time_value_list)
 
 
 class MedicalList(APIView):
