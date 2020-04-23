@@ -6,7 +6,7 @@ app_name = 'corona_app'
 
 urlpatterns = [
     path('report/', views.corona_history_list),
-    path('result/', views.CoronaAppResult.as_view()),
+    path('temp_calculator/', views.CoronaAppResult.as_view()),
     path('map/<str:status>/', views.IntersectMapResult.as_view()),    
     path('amIExposed/<str:uuid>', views.UserExposure.as_view()),
     path('result/times/', views.CoronaAppTimeslots.as_view()),
