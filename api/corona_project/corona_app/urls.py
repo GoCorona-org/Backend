@@ -1,5 +1,7 @@
-from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
+
+# from django.conf.urls import url
+from django.urls import path
 from corona_app import views
 
 app_name = 'corona_app'

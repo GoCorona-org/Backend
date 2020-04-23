@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_multiple_model',
+    'rest_framework_swagger',
     # 'corona_app',
     'corona_app.apps.CoronaAppConfig',
 ]
@@ -74,6 +75,7 @@ TEMPLATES = [
 REST_FRAMEWORK = {
 
     'DATETIME_FORMAT': "%H.%M.%d.%m.%Y", 
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
 
 WSGI_APPLICATION = 'corona_project.wsgi.application'
