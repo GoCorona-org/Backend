@@ -1,7 +1,9 @@
 import geopandas as gpd
+import numpy as np
+import csv
+
 from geopandas import GeoDataFrame, GeoSeries, overlay
 from shapely.geometry import Point, Polygon
-
 
 from corona_app.models import CoronaApp, MedicalMap
 
@@ -12,8 +14,8 @@ from corona_app.models import CoronaApp, MedicalMap
 def intersection_calculator(data_frame):
 	allPts = GeoDataFrame(data_frame,crs={"init":"EPSG:4326"},geometry=[Point(xy) for xy in zip(data_frame["Lat"], data_frame["Lng"])]).to_crs("EPSG:3310")
 	#EPSG == 3310 for distance in meters
-	positivePoints = allPts[allPts['Status']==1]
-	negativePoints = allPts[allPts['Status']==0]
+	positivePoints = allPts[allPts['Status']==0]  ## Positive
+	negativePoints = allPts[allPts['Status']==-1] ## Unknown
 	#print(positivePoints)
 	#print(negativePoints)
 
@@ -36,12 +38,12 @@ def intersection_calculator(data_frame):
 
 	#res_intersect = overlay(positivePointsBuffered,negativePointsBuffered,how='intersection')
 	#res_intersect=res_intersect.drop(['Status_1','UUID_1','Lat_1','Lng_1','geometry']
-	res_intersect.rename(columns={'Status':'Status','UUID':'UUID','Lat':'Lat','Lng':'Lng'},inplace=True)
+	# res_intersect.rename(columns={'Status':'Status','UUID':'UUID','Lat':'Lat','Lng':'Lng'},inplace=True)
 
 	#res_intersect['UUID_2'],res_intersect['Status_2']
 	#res_intersect.drop_duplicates(subset ="UUID",keep = "first", inplace = True)
 	#res_intersect['Timeslot']=timestamp_string
-	res_intersect = res_intersect.drop(['geometry'], axis=1)
+	res_intersect = res_intersect.drop(['Status', 'Lat', 'Lng', 'geometry', 'timeslot'], axis=1)
 	print(res_intersect)
 		
 	return res_intersect

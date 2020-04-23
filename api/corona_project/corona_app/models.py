@@ -16,15 +16,15 @@ class CoronaApp(models.Model):
 	uuid = models.CharField(max_length=1000, default='a')
 	timeslot = models.CharField(max_length=100, default='00.00.01.01.2020')
 	
-	status = models.IntegerField(default=0)
+	degree = models.IntegerField(default=-1)
 	
 	latitude= models.FloatField(default=0)
-	longitude= models.FloatField(default=0)
+	longitude= models.FloatField(default=0)        
 
 
 
 class MedicalMap(models.Model):
-    #name = models.CharField(max_length=100, blank=True, default='a')
+    #name = models.CharField(max_length=100, default='a')
     age = models.IntegerField(default=0)
 
     # GENDER, AGE, HEIGHT, WEIGHT
@@ -71,7 +71,8 @@ class MedicalMap(models.Model):
         YES_OPT3 = 3, 'If Yes, then fever that comes and goes'
         YES_OPT4 = 4, 'If Yes, then have not checked the Temperature'
 
-    fever = models.IntegerField(choices=Fever.choices, default=Fever.NO)
+    # fever = models.IntegerField(choices=Fever.choices, default=Fever.NO)
+    fever = models.IntegerField(default=0)
 
 
 
@@ -84,7 +85,8 @@ class MedicalMap(models.Model):
         YES_OPT3 = 3, 'If Yes, then Cough with chest pain'
         YES_OPT4 = 4, 'If Yes, then Cough with abdominal pain'
 
-    cough = models.IntegerField(choices=Cough.choices, default=Cough.NO)
+    # cough = models.IntegerField(choices=Cough.choices, default=Cough.NO)
+    cough = models.IntegerField(default=0)
 
 
     #Shortness of breadth
@@ -115,7 +117,9 @@ class MedicalMap(models.Model):
         NO_OPT2 = 2, 'Worsened'
         NO_OPT3 = 3, 'Worsened considerably'
 
-    symptoms_improvement = models.IntegerField(choices=Improvement.choices, default=Improvement.YES)
+    # symptoms_improvement = models.IntegerField(choices=Improvement.choices, default=Improvement.YES)
+    symptoms_improvement = models.IntegerField(default=0)
+
 
     #Domestic Travel info
     #flight, train, auto, cab
@@ -125,14 +129,14 @@ class MedicalMap(models.Model):
     domestic_auto = models.BooleanField(default=False)
     domestic_cab = models.BooleanField(default=False)
 
-    domestic_airport_from = models.CharField(max_length=1000, blank=True, default=' ')
-    domestic_airport_to = models.CharField(max_length=1000, blank=True, default=' ')
-    current_state = models.CharField(max_length=1000, blank=True, default=' ')
+    domestic_airport_from = models.CharField(max_length=1000, default=' ')
+    domestic_airport_to = models.CharField(max_length=1000, default=' ')
+    current_state = models.CharField(max_length=1000, default=' ')
 
 
 
     international_mode = models.BooleanField(default=False)
-    country_travelled = models.CharField(max_length=1000, blank=True, default=' ')
+    country_travelled = models.CharField(max_length=1000, default=' ')
     # gamma_inter = np.random.randint(1,100)
 
 
