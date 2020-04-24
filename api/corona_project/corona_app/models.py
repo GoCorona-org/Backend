@@ -25,6 +25,7 @@ class CoronaApp(models.Model):
 
 class MedicalMap(models.Model):
     #name = models.CharField(max_length=100, default='a')
+    med_uuid = models.CharField(max_length=1000, default='a')
     age = models.IntegerField(default=0)
 
     # GENDER, AGE, HEIGHT, WEIGHT

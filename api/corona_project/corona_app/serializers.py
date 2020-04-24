@@ -34,7 +34,7 @@ class CoronaAppSerializer(serializers.Serializer):
 
 
 class MedicalMapSerializer(serializers.Serializer):
-
+    med_uuid = serializers.CharField(max_length=1000, default='a')
     age = serializers.IntegerField(default=0)
 
     # GENDER, AGE, HEIGHT, WEIGHT

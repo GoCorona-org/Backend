@@ -90,20 +90,12 @@ class IntersectMapResult(APIView):
 		for person in status_uuids:
 			person_objects = status_objects.filter(uuid = person)
 			all_times = list(person_objects.values_list('timeslot', flat=True).distinct())
-			print(all_times)
 			res_times = [datetime.strptime(i, '%H.%M.%m.%d.%Y') for i in all_times] 
-			print(res_times)
 			max_time = all_times[res_times.index(max(res_times))]
-			print(max_time)
 			obj_df = read_frame(person_objects.filter(timeslot = max_time))
-			print(type(obj_df))
 			obj_df = obj_df.drop(['id', 'degree'], axis=1)
 			status_df = status_df.append(obj_df, ignore_index=True)
-			print(obj_df)
-			print(status_df)
-
-
-
+			
 		status_json = status_df.to_json(orient='records')
 		# status_json = status_json.replace('\\"', '\"')
 		status_json = json.loads(status_json)
@@ -158,27 +150,21 @@ class MedicalDetail(APIView):
     """
     Retrieve, update or delete a snippet instance.
     """
-    def get_object(self, pk):
-        try:
-            return MedicalMap.objects.get(pk=pk)
-        except MedicalMap.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        snippet = self.get_object(pk)
+    def get(self, request, med_uuid, format=None):
+        snippet = MedicalMap.objects.get(med_uuid = med_uuid)
         serializer = MedicalMapSerializer(snippet)
         return Response(serializer.data)
 
-    def put(self, request, pk, format=None):
-        snippet = self.get_object(pk)
+    def put(self, request, med_uuid, format=None):
+        snippet = MedicalMap.objects.get(med_uuid = med_uuid)
         serializer = MedicalMapSerializer(snippet, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk, format=None):
-        snippet = self.get_object(pk)
+    def delete(self, request, med_uuid, format=None):
+        snippet = self.MedicalMap.objects.get(med_uuid = med_uuid)
         snippet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -187,14 +173,8 @@ class MedicalResult(APIView):
     """
     Retrieve, update or delete a snippet instance.
     """
-    def get_object(self, pk):
-        try:
-            return MedicalMap.objects.get(pk=pk)
-        except MedicalMap.DoesNotExist:
-            raise Http404
-
-    def get(self, request, pk, format=None):
-        snippet = self.get_object(pk)
+    def get(self, request, med_uuid, format=None):
+        snippet = MedicalMap.objects.get(med_uuid = med_uuid)
         # serializer = MedicalMapSerializer(snippet)
         F, Shades = MedicalScoreCalculator(snippet)
         score_json = {"score": str(F), "score_color": Shades}
