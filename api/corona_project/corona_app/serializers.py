@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from corona_app.models import CoronaApp, MedicalMap, LANGUAGE_CHOICES, STYLE_CHOICES
+from corona_app.models import CoronaApp, MedicalMap
 
 
 class CoronaAppSerializer(serializers.Serializer):

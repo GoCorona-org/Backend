@@ -139,6 +139,9 @@ class MedicalList(APIView):
         return Response("Post Medical Data here")
 
     def post(self, request, format=None):
+    	### Removal of this line maybe necessary
+    	MedicalMap.objects.all().delete()
+        
         serializer = MedicalMapSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -164,7 +167,7 @@ class MedicalDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, med_uuid, format=None):
-        snippet = self.MedicalMap.objects.get(med_uuid = med_uuid)
+        snippet = MedicalMap.objects.get(med_uuid = med_uuid)
         snippet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

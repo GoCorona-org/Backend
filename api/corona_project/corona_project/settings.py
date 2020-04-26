@@ -25,7 +25,7 @@ SECRET_KEY = 'y)p(i6s@5tu3g&gmyldkr)(rfuir541k3crjsz76!v4v++8t2y'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0']
 
 
 # Application definition
@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_multiple_model',
-    'rest_framework_swagger',
     # 'corona_app',
     'corona_app.apps.CoronaAppConfig',
 ]
@@ -88,7 +87,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'corona_project',
         'USER': 'postgres',
-        'PASSWORD': 'rinkichiki',
+        'PASSWORD': 'spotcorona',
         'HOST': 'localhost',
         'PORT': '',
     }
