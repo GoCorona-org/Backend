@@ -25,10 +25,6 @@ SECRET_KEY = '0tb^!)!k!b^2!v6nxi#tpse&#wz*925l8f5odw7=wvwasv4_ad'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# SECURITY WARNING: keep the db password used in production secret!
-DB_PASSWORD = os.environ.get('DB_PASSWORD','spotcorona') 
-
-
 ALLOWED_HOSTS = []
 
 
@@ -85,7 +81,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'medical_questionnaire',
         'USER': 'postgres',
-        'PASSWORD': DB_PASSWORD,
+        'PASSWORD': 'spotcorona',
         'HOST': 'localhost',
         'PORT': '',
     }
