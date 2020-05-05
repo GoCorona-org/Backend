@@ -1,40 +1,10 @@
 from rest_framework import serializers
-from corona_app.models import CoronaApp, MedicalMap
-
-
-class CoronaAppSerializer(serializers.Serializer):
-
-    timeslot = serializers.CharField(max_length=100, default='00.00.01.01.2020')
-    uuid = serializers.CharField(max_length=100, default='a')
-    degree = serializers.IntegerField(default=-1)
-    
-    latitude= serializers.FloatField(default=0)
-    longitude= serializers.FloatField(default=0)
-    
-    #required=True, 
-
-    def create(self, validated_data):
-        """
-        Create and return a new `Snippet` instance, given the validated data.
-        """
-        return CoronaApp.objects.create(**validated_data)
-
-    # def update(self, instance, validated_data):
-    #     """
-    #     Update and return an existing `Snippet` instance, given the validated data.
-    #     """
-    #     instance.timeslot = validated_data.get('name', instance.timeslot)
-    #     instance.uuid = validated_data.get('name', instance.uuid)
-    #     instance.status = validated_data.get('status', instance.status)
-    #     instance.latitude = validated_data.get('latitude', instance.latitude)
-    #     instance.longitude = validated_data.get('longitude', instance.longitude)
-        
-    #     instance.save()
-    #     return instance
+from medicalmap.models import MedicalMap
 
 
 class MedicalMapSerializer(serializers.Serializer):
     med_uuid = serializers.CharField(max_length=1000, default='a')
+    work = serializers.IntegerField(default=0)
     age = serializers.IntegerField(default=0)
 
     # GENDER, AGE, HEIGHT, WEIGHT
@@ -51,6 +21,8 @@ class MedicalMapSerializer(serializers.Serializer):
 
     #Kidney
     kidney = serializers.BooleanField(default=False)
+    #Asthma
+    asthma = serializers.BooleanField(default=False)
     #Heart
     heart = serializers.BooleanField(default=False)
     #Lungs
@@ -61,10 +33,11 @@ class MedicalMapSerializer(serializers.Serializer):
     hypertension =  serializers.BooleanField(default=False)
 
     #Immunocompromised
-    #HIV
-    hiv = serializers.BooleanField(default=False)
-    #Transplant
-    transplant = serializers.BooleanField(default=False)
+    #HIV/Transplant
+    immuno = serializers.BooleanField(default=False)
+
+    #Smoking Habits
+    smoker = serializers.BooleanField(default=False)
 
 
     #Symptoms

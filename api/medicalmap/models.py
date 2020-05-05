@@ -1,23 +1,23 @@
 from django.db import models
+from django.contrib.auth.models import User 
 from django_pandas.managers import DataFrameManager
+from oauth2client.contrib.django_util.models import CredentialsField
+
 
 # Create your models here.
 
-
-class CoronaApp(models.Model):
-	uuid = models.CharField(max_length=1000, default='a')
-	timeslot = models.CharField(max_length=100, default='00.00.01.01.2020')
-	
-	degree = models.IntegerField(default=-1)
-	
-	latitude= models.FloatField(default=0)
-	longitude= models.FloatField(default=0)        
-
-
+# class CredentialsModel(models.Model): 
+#     id = models.ForeignKey(User, primary_key = True, on_delete = models.CASCADE) 
+#     credential = CredentialsField()
+#     updated_time = models.CharField(max_length = 80, null = True)
 
 class MedicalMap(models.Model):
     #name = models.CharField(max_length=100, default='a')
     med_uuid = models.CharField(max_length=1000, default='a')
+
+    #0-None/Work from home, 1-Bound to work outside, 2-Delivery persons, 3-Police/Any other force, 4-Doctors/Health personnel
+    work = models.IntegerField(default=0)
+    
     age = models.IntegerField(default=0)
 
     # GENDER, AGE, HEIGHT, WEIGHT
@@ -34,6 +34,8 @@ class MedicalMap(models.Model):
 
     #Kidney
     kidney = models.BooleanField(default=False)
+    #Asthma
+    asthma = models.BooleanField(default=False)
     #Heart
     heart = models.BooleanField(default=False)
     #Lungs
@@ -44,12 +46,13 @@ class MedicalMap(models.Model):
     hypertension =  models.BooleanField(default=False)
 
     #Immunocompromised
-    #HIV
-    hiv = models.BooleanField(default=False)
-    #Transplant
-    transplant = models.BooleanField(default=False)
+    #HIV/Transplant
+    immuno = models.BooleanField(default=False)
 
 
+    #Smoking habits
+    smoker = models.BooleanField(default=False)
+    
 
     #Symptoms
     
@@ -127,10 +130,10 @@ class MedicalMap(models.Model):
     current_state = models.CharField(max_length=1000, default=' ')
 
 
-
     international_mode = models.BooleanField(default=False)
     country_travelled = models.CharField(max_length=1000, default=' ')
-    # gamma_inter = np.random.randint(1,100)
 
+    travel_filled = models.BooleanField(default=False)
+    
 
 

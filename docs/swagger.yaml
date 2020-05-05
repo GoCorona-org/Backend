@@ -12,163 +12,22 @@ info:
 host: api.spotcorona.org
 basePath: /v1
 tags:
-  - name: Intersection
-    description: Everything about Intersection Calculator Endpoint
+  - name: Medical
+    description: Everything about medical hisory endpoints
     externalDocs:
       description: Find out more
       url: 'http://swagger.io'
-  - name: Medical
-    description: Everything about medical hisory endpoint
-  # - name: Travel History
-  #   description: Everything related to travel history
-  #   externalDocs:
-  #     description: Find out more about our group
-  #     url: 'http://swagger.io'
-  # - name: User
-  #   description: Everything related to user's personal details
-  #   externalDocs:
-  #     description: Find out more about our group
-  #     url: 'http://swagger.io'
+  - name: User
+    description: Everything related to user's personal details
+    externalDocs:
+      description: Find out more about our group
+      url: 'http://swagger.io'
 schemes:
   - https
   - http
 paths:
-  /report:
-    post:
-      tags:
-        - Intersection
-      summary: Add a set of location history points to the database
-      description: ''
-      operationId: reportLocation
-      consumes:
-        - application/json
-      produces:
-        - application/json
-      parameters:
-        - in: body
-          name: Location Data Upload
-          description: Location history data that needs to be added to the database
-          required: true
-          schema:
-            type: object
-            properties:
-              uuid:
-                type: string
-              location_history:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    timeslot:
-                      type: string
-                      format: date-time
-                    status:
-                      type: string
-                      enum:
-                        - unknown
-                        - positive
-                    lat:
-                      type: number
-                      format: float
-                    long:
-                      type: number
-                      format: float
-      responses:
-        '201':
-          description: Multiple Objects with uuid created
-        '400':
-          description: Invalid input
-      security:
-        - spotcorona_auth:
-            - 'write:spotcorona_api'
-            - 'read:spotcorona_api'
-    get:
-      tags:
-        - Intersection
-      summary: >-
-        This request enables the calculation of the intersection algo in the
-        backend on all the values existing in the location history database
-      operationId: initiateIntersectionCalculation
-      produces:
-        - application/json
-      responses:
-        '201':
-          description: Intersection Calculation Done 
-  '/map/{status}':
-    get:
-      tags:
-        - Intersection
-      summary: Get last known coordinates of all users of a particular status
-      operationId: findUsersByStatus
-      produces:
-        - application/json
-      parameters:
-        - name: status
-          in: path
-          required: true
-          type: string
-          description: Patient status to be queried
-          enum:
-            - exposed
-            - positive
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            type: array
-            items:
-              type: "object"
-              properties:
-                uuid:
-                  $ref: '#/definitions/CoronaApp/properties/uuid'
-                timeslot:
-                  $ref: '#/definitions/CoronaApp/properties/timeslot'
-                latitude:
-                  $ref: '#/definitions/CoronaApp/properties/latitude'
-                longitude:
-                  $ref: '#/definitions/CoronaApp/properties/longitude'
-        '400':
-          description: Invalid status value
-      security:
-        - spotcorona_auth:
-            - 'read:spotcorona_api'
-  '/amIExposed/{user_location_id}':
-    get:
-      tags:
-        - Intersection
-      summary: Find if the user with the queried id is exposed
-      description: Returns status and degree of exposure
-      operationId: getAmIExposedById
-      produces:
-        - application/json
-      parameters:
-        - name: user_location_id
-          in: path
-          description: ID of user to return - UUID
-          required: true
-          type: string
-      responses:
-        '200':
-          description: successful operation
-          schema:
-            type: object
-            properties:
-              Exposure:
-                type: string
-                enum:
-                  - unknown
-                  - positive
-                  - exposed
-        '400':
-          description: Invalid ID supplied
-        '404':
-          description: UUID not found
-      security:
-        - api_key: []
-        - spotcorona_auth:
-            - 'read:spotcorona_api'
   
-  /medmap:
+  /medmap/:
     post:
       tags:
         - Medical
@@ -197,7 +56,7 @@ paths:
             - 'write:spotcorona_api'
             - 'read:spotcorona_api'
             
-  /medmap/{med_uuid}:
+  /medmap/{med_uuid}/:
     put:
       tags:
         - Medical
@@ -232,7 +91,7 @@ paths:
             - 'write:spotcorona_api'
             - 'read:spotcorona_api'
             
-  /medmap/result/{med_uuid}:
+  /medmap/result/{med_uuid}/:
     get:
       tags:
         - Medical
@@ -257,6 +116,8 @@ paths:
                 type: number
               score_color:
                 type: string
+              probability:
+                type: number
                 
         '400':
           description: Invalid ID supplied
@@ -266,7 +127,40 @@ paths:
         - api_key: []
         - spotcorona_auth:
             - 'read:spotcorona_api'
-            
+  
+  /medmap/list/{file}/:
+    get:
+      tags:
+        - Medical
+      summary: Returns the contents present in that file as a list
+      description: Utilize this endpoint to populate country, state and domestic airport fields in UI
+      operationId: getfilelist
+      produces:
+        - application/json
+      parameters:
+        - name: file
+          in: path
+          description: name of file. Use 'domestic_airport' for domestic_airport_from and domestic_airport_to fields. Use 'state' for current_state field. Use 'country' for country_travelled field.
+          required: true
+          type: string
+          enum: [country, state, domestic_airport]
+             
+      responses:
+        '200':
+          description: list of values returned
+          schema:
+            type: array
+            items: 
+              type: string
+                
+        '400':
+          description: Invalid filename supplied
+        '404':
+          description: filename not found
+      security:
+        - api_key: []
+        - spotcorona_auth:
+            - 'read:spotcorona_api'         
   
   # /user:
   #   post:
@@ -424,27 +318,6 @@ securityDefinitions:
     name: api_key
     in: header
 definitions:
-  CoronaApp:
-    type: object
-    properties:
-      uuid:
-        type: string
-      timeslot:
-        type: string
-        format: date-time
-      degree:
-        type: number
-        format: integer
-        minimum: -1
-        maximum: 1
-      latitude:
-        type: number
-        format: float
-      longitude:
-        type: number
-        format: float
-    xml:
-      name: Location Data
   MedicalMap:
     type: object
     properties:
@@ -453,6 +326,12 @@ definitions:
         properties:
           med_uuid:
             type: string
+          work:
+            type: number
+            format: integer
+            minimum: 0
+            maximum: 4
+            description: '0-None/Work from home, 1-Bound to work outside, 2-Delivery persons, 3-Police/Any other force, 4-Doctors/Health personnel'
           age:
             type: number
             format: integer
@@ -466,6 +345,8 @@ definitions:
             type: boolean
           kidney:
             type: boolean
+          asthma:
+            type: boolean
           heart:
             type: boolean
           lungs:
@@ -474,20 +355,22 @@ definitions:
             type: boolean
           hypertension:
             type: boolean
-          hiv:
+          immuno:
             type: boolean
-          transplant:
+          smoker:
             type: boolean
           fever:
             type: number
             format: integer
             minimum: 0
             maximum: 4
+            description: '0-No fever, 1-Temperature between 98.6 to 100.4 ^C, 2-Temperature between 100.4 to 104 ^C, 3-fever that comes and goes, 4-have not checked the Temperature'
           cough:
             type: number
             format: integer
             minimum: 0
             maximum: 4
+            description: '0-No cough, 1-Dry Cough, 2-Cough with sputum, 3-Cough with chest pain, 4-Cough with abdominal pain'
           breathlessness:
             type: boolean
           fatigue:
@@ -515,6 +398,7 @@ definitions:
             format: integer
             minimum: 0
             maximum: 3
+            description: '0-Improved, 1-No change, 2-Worsened, 3-Worsened considerably'
             
       travel_data:
         type: "object"
