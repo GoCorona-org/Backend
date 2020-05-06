@@ -4,7 +4,7 @@ from django_pandas.managers import DataFrameManager
 from oauth2client.contrib.django_util.models import CredentialsField
 
 
-Create your models here.
+#Create your models here.
 
 class CredentialsModel(models.Model): 
     id = models.ForeignKey(User, primary_key = True, on_delete = models.CASCADE) 
