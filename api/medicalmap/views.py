@@ -1,6 +1,5 @@
 # Create your views here.
-from medicalmap.models import MedicalMap
-# , CredentialsModel
+from medicalmap.models import MedicalMap, CredentialsModel
 from medicalmap.serializers import MedicalMapSerializer
 from medicalmap.calculations import MedicalScoreCalculator
 from spotcorona import settings
