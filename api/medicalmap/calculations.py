@@ -4,50 +4,9 @@ import csv
 
 from geopandas import GeoDataFrame, GeoSeries, overlay
 from shapely.geometry import Point, Polygon
+from math import exp
 
-from corona_app.models import CoronaApp, MedicalMap
-
-
-
-
-
-def intersection_calculator(data_frame):
-	allPts = GeoDataFrame(data_frame,crs={"init":"EPSG:4326"},geometry=[Point(xy) for xy in zip(data_frame["Lat"], data_frame["Lng"])]).to_crs("EPSG:3310")
-	#EPSG == 3310 for distance in meters
-	positivePoints = allPts[allPts['Status']==0]  ## Positive
-	negativePoints = allPts[allPts['Status']==-1] ## Unknown
-	#print(positivePoints)
-	#print(negativePoints)
-
-	positivePointsBuffered = positivePoints.set_geometry(positivePoints.geometry.buffer(20,resolution=16),inplace=False)
-	#negativePointsBuffered = negativePoints.set_geometry(negativePoints.geometry.buffer(20,resolution=16),inplace=False)
-	#print(positivePointsBuffered)
-
-	#ax=positivePointsBuffered.plot(color="red")
-	#negativePointsBuffered.plot(ax=ax,color='green', alpha=0.5)
-
-	intersecting_points = negativePoints.within(positivePointsBuffered.unary_union)
-	res_intersect = negativePoints[intersecting_points]
-
-	#intersecting_points = negativePoints.intersection(positivePointsBuffered.unary_union)
-	#print(intersecting_points)
-	#print(negativePoints)
-
-	#print(negativePoints.loc[negativePoints['geometry'].isin(intersecting_points.to_numpy())])
-	#combined_infectious_points = positivePointGeometryBuffered.unary_union
-
-	#res_intersect = overlay(positivePointsBuffered,negativePointsBuffered,how='intersection')
-	#res_intersect=res_intersect.drop(['Status_1','UUID_1','Lat_1','Lng_1','geometry']
-	# res_intersect.rename(columns={'Status':'Status','UUID':'UUID','Lat':'Lat','Lng':'Lng'},inplace=True)
-
-	#res_intersect['UUID_2'],res_intersect['Status_2']
-	#res_intersect.drop_duplicates(subset ="UUID",keep = "first", inplace = True)
-	#res_intersect['Timeslot']=timestamp_string
-	res_intersect = res_intersect.drop(['Status', 'Lat', 'Lng', 'geometry', 'timeslot'], axis=1)
-	print(res_intersect)
-		
-	return res_intersect
-
+from medicalmap.models import MedicalMap
 
 
 def MedicalScoreCalculator(map):
@@ -75,13 +34,12 @@ def MedicalScoreCalculator(map):
 	r_max = 24
 	d_max = 10
 	gamma_max = 100
+	i_max = 5
 	T_max = 100
 
-	Fth1 = 50
-	Fth2 = 35
-	Fth3 = 23
-	Fth4 = 30
 	fth = 0.65
+
+	work = option_array(map.work,5)
 
 	age = map.age
 	height = map.height
@@ -89,16 +47,16 @@ def MedicalScoreCalculator(map):
 
 	# gahw_arr = np.array([self_else, gender, age, height, weight])
 
-	airport_from = map.domestic_airport_from.upper()
-	airport_to = map.domestic_airport_to.upper()
-	current_state = map.current_state.upper()
-	airport_filename = "airport.csv"
+	airport_from = map.domestic_airport_from
+	airport_to = map.domestic_airport_to
+	current_state = map.current_state
+	airport_filename = "domestic_airport.csv"
 	state_filename = "state.csv"
 
 	A = float(csv_reader(airport_filename, airport_from))
 	B = float(csv_reader(airport_filename, airport_to))
 	print("airport from: ", A)
-	print("airport from: ", B)
+	print("airport to: ", B)
 
 	C = float(csv_reader(state_filename, current_state))
 	print("state weight: ", C)
@@ -113,6 +71,8 @@ def MedicalScoreCalculator(map):
 
 	#Kidney
 	k = int(map.kidney)
+	#Asthma
+	asth = int(map.asthma)
 	#Heart
 	hrt = int(map.heart)
 	#Lungs
@@ -122,16 +82,16 @@ def MedicalScoreCalculator(map):
 	#Hypertension
 	h =  int(map.hypertension)
 
+	prev_cond_2 = np.array([k, asth, hrt, l, s, h])
+
 	#Immunocompromised
-	#HIV
-	hiv = int(map.hiv)
-	#Transplant
-	trans = int(map.transplant)
+	immuno = int(map.immuno)
 
-	prev_cond_2 = np.array([k, hrt, l, s, h])
-	prev_cond_3 = np.array([hiv, trans])
 
-	prev_cond = np.array([diab, int(prev_cond_2.any()), int(prev_cond_3.any())])
+	prev_cond = np.array([diab, int(prev_cond_2.any()), immuno])
+
+
+	sm = int(map.smoker)
 
 	#Symptoms
 
@@ -181,6 +141,9 @@ def MedicalScoreCalculator(map):
 	#Heart Rate/BP weights
 	weight_hb = np.array([0,0])  #2
 	weights_P = np.array([0.3, 0.3, 0.3, 0.1])
+
+	#work weights
+	weight_work = np.array([0, 0.4, 0.6, 0.8, 1])
 
 	#Prev Conditions
 	weight_pc = np.array([2,2,3])  #6
@@ -232,6 +195,9 @@ def MedicalScoreCalculator(map):
 
 
 	#### SCORE CALCULATION
+	W_scores = work*weight_work
+	W = np.sum(W_scores)
+
 	P_scores = P_arr*weights_P
 	P = np.sum(P_scores)
 
@@ -261,46 +227,65 @@ def MedicalScoreCalculator(map):
 	alpha = p + q + r + h1 + h2
 
 	if(international_mode):
-		country_travelled = map.country_travelled.upper()
+		country_travelled = map.country_travelled
 		country_filename = 'country.csv'
-		gamma_inter = float(csv_reader(airport_filename, airport_from))
-		T = (2 + 3*(gamma_inter/gamma_max) + 3*(alpha/alpha_max) + 2*(d/d_max))*10
+		gamma_inter = float(csv_reader(country_filename, country_travelled))
+		i = 2+3*(gamma_inter/gamma_max)
+		T = 0.5*(alpha/alpha_max)+ 0.3*(d/d_max) + 0.2*(i/i_max) 
 
 	else:
-		T = (7*(alpha/alpha_max) + 3*(d/d_max))*10
+		T = 0.7*(alpha/alpha_max) + 0.3*(d/d_max)
 
 
-	t = T/T_max
+	# t = T/T_max
 	# FINAL SCORE --- F
-	F = 100 * (0.9*t + 0.1*P)
+	F = 100 * (0.85*T + 0.1*P + 0.05*W)
+
+	### PROBABILITY CALCULATION
+	 
+	c_factor = 1
+	tao = 48
+	beta = 0.1
+
+	Probability = 1 - exp( -1 * ((exp(c_factor*F - tao))**beta))
+
 
 	print("SCORE: ", F)
 
+	if map.travel_filled:
+
+		Fth1 = 50
+		Fth2 = 30
+
+	else:
+		Fth1 = 35
+		Fth2 = 20
+
+	colors = ['#ff0000', '#e50000', '#cc0000', '#b20000', '#990000']
+
+
 	if (F > Fth1):
-		Shades = "Red"
+		div = (100 - Fth1)/len(colors)
+		index = int((F - Fth1)/div)
+		Shades = colors[index]
 
-	elif ((F>Fth2) and ((q/q_max) > fth)):
-		Shades = "Blue"
-
-	elif ((F>Fth4) and (((q + r)/(q_max + r_max)) > fth)):
-		Shades = "Cyan"
-
-	elif ((F>Fth3) and ((r/r_max) > fth)):
-		Shades = "Yellow"
+	elif ((F>Fth2) and (((q + r)/(q_max + r_max)) > fth)):
+		Shades = '#785027'
 
 	else:
 		Shades = "Null"
 
+
 	print("Score color: ", Shades)
 	
-	return (F, Shades)
+	return (F, Shades, Probability)
 
 
 
 def csv_reader(filename, key):
 	with open(filename, mode='r') as infile:
 		reader = csv.reader(infile)
-		mydict = {(rows[0].upper()):rows[1] for rows in reader}
+		mydict = {rows[0]:rows[1] for rows in reader}
 
 	return mydict[key]
 
