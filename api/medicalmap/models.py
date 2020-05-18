@@ -1,15 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User 
 from django_pandas.managers import DataFrameManager
-from oauth2client.contrib.django_util.models import CredentialsField
 
-
-# Create your models here.
-
-# class CredentialsModel(models.Model): 
-#     id = models.ForeignKey(User, primary_key = True, on_delete = models.CASCADE) 
-#     credential = CredentialsField()
-#     updated_time = models.CharField(max_length = 80, null = True)
 
 class MedicalMap(models.Model):
     #name = models.CharField(max_length=100, default='a')
