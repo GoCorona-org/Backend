@@ -16,17 +16,11 @@ from django.db.models import Q
 from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 
-from httplib2 import Http
-from googleapiclient.discovery import build
-from oauth2client.contrib import xsrfutil
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.contrib.django_util.storage import DjangoORMStorage
 
 import numpy as np
 import pandas as pd
 import glob, os
 import csv, json
-import httplib2
 
 
 
