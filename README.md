@@ -19,24 +19,7 @@ Django rest multiple models (pip install django-rest-multiple-models)
 psycopg2 (pip install psycopg2)
 Shapely (pip install Shapely)
 Geopandas (some of it’s pre-requirements)  (pip install geopandas)
-Google API python client (pip install google-api-python-client)
-Authentication client (pip install oauth2client)
-(pip install jsonpickle)
 ```
-### Update urlresolvers to reverse for authentication client package
-
-Go to
-/path_to_python3/site-packages/oauth2client/contrib/django_util/__init__.py
-
-In Line no 233 change
-from django.core import urlresolvers 
-to 
-from django.urls import reverse
-
-In Line no 411 change
-urlresolvers.reverse(...) 
-to 
-reverse(...)
 
 ### There may arise some problems\errors while installing geopandas
 
