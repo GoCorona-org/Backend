@@ -20,6 +20,3 @@ pytz==2019.3
 Shapely==1.7.0
 six==1.12.0
 sqlparse==0.3.1
-google-api-python-client==1.8.2
-oauth2client==4.1.2
-jsonpickle==1.4.1
