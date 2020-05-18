@@ -91,8 +91,6 @@ DATABASES = {
     }
 }
 
-GOOGLE_OAUTH2_CLIENT_SECRETS_JSON = 'client_secrets.json'
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
