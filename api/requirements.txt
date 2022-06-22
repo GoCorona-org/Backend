@@ -11,7 +11,7 @@ Fiona==1.8.13
 GDAL==3.0.4
 geopandas==0.7.0
 munch==2.5.0
-numpy==1.17.0
+numpy==1.22.0
 pandas==1.0.3
 psycopg2==2.8.5
 pyproj==2.6.0
